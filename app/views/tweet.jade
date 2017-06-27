@@ -1,0 +1,21 @@
+html
+    head
+        title= title
+        link( href='/css/main.css' , rel='stylesheet' )
+    body
+        
+        div( ng-app='Hello' ng-controller='NameController' )
+            input( name='bigname' , type='text' , ng-model='bigname' )
+
+        - for (var i = 0; i < 99; ++i) {
+        p='------------------------'
+        ul
+            li= tweet[i].created_at
+            li= tweet[i].text
+            li= tweet[i].retweet_count
+            li 
+                a( href="https://twitter.com/"+tweet[i].user.id+"/status/"+tweet[i].id target='_blank') link
+        - }
+
+        script(type='text/javascript',src='/lib/angular/angular.min.js')
+        script(type='text/javascript',src='/application.js')

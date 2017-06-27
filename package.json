@@ -1,0 +1,30 @@
+{
+  "name": "nodejs-project",
+  "version": "1.0.0",
+  "description": "test nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "test",
+    "node"
+  ],
+  "author": "bigtoi",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "~1.13.0",
+    "compression": "~1.5.0",
+    "cookie-session": "~1.2.0",
+    "curl": "^0.1.4",
+    "express": "^4.15.3",
+    "express-validator": "~2.14.0",
+    "fb": "^2.0.0",
+    "google-trends-api": "^4.1.0",
+    "jade": "~1.11.0",
+    "mongodb": "^2.2.28",
+    "morgan": "~1.6.0",
+    "node-sass-middleware": "~0.9.0",
+    "twitter": "^1.7.1"
+  }
+}

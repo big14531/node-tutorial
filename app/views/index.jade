@@ -1,0 +1,34 @@
+html
+    head
+        title= title
+        link( href='/css/main.css' , rel='stylesheet' )
+    body
+        
+        div( ng-app='Hello' ng-controller='NameController' )
+            input( name='bigname' , type='text' , ng-model='bigname' )
+
+            p {{ bigname | sayhello }}
+
+        h1=message
+        if isLoggedIn
+            h3=title
+            form( name='logout' , method='POST' action='logout' )
+                div
+                    input( type='submit' , value='Logout' )
+        else
+            h3=title
+            form( name='login' , method='POST' action='login' )
+                div
+                    label( for='email' ) email
+                    input( name='email' , type='email' , placeholder='youremail@email.com' )
+                div
+                    label( for='password') pass
+                    input( name='password' , type='password' , placeholder='password' )
+                div
+                    input( name='remember' , type='checkbox' , value='remember' ) 
+                    | Remember me
+                div
+                    input( value='login' , type='submit' )
+
+        script(type='text/javascript',src='/lib/angular/angular.min.js')
+        script(type='text/javascript',src='/application.js')
