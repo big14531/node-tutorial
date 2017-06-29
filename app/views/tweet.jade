@@ -4,10 +4,15 @@ html
         link( href='/css/main.css' , rel='stylesheet' )
     body
         
-        div( ng-app='Hello' ng-controller='NameController' )
-            input( name='bigname' , type='text' , ng-model='bigname' )
+        form( name='tweet_name' , method='GET' action='getTweet' )
+            div
+                label( for='twitter' ) Twitter
+                input( name='twitter' , placeholder='twitter here' )
+            div
+                input( value='search' , type='submit' )
 
-        - for (var i = 0; i < 99; ++i) {
+
+        - for (var i = 0; i < tweet.length; ++i) {
         p='------------------------'
         ul
             li= tweet[i].created_at

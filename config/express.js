@@ -17,6 +17,7 @@ module.exports = function () {
         name:'session',
         keys:[ 'secert_key1' , 'secert_key1' ]
     }));
+
     app.use( bodyParser.urlencoded({
         extended:true
     }));
@@ -27,8 +28,6 @@ module.exports = function () {
     app.set( 'view engine' , 'jade' );
    
     require( '../app/routes/index.route' )(app);
-    require( '../app/routes/user.route' )(app);
-    require( '../app/routes/social.route' )(app);
 
     // เอาไว้ก่อน express.static
     app.use( sass({

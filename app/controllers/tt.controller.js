@@ -8,14 +8,17 @@ var client = new Twitter({
     access_token_secret : config.twitterAuth.access_token_secret
 });
 
-var params = {
-    screen_name :'Kom_chad_luek',
-    count:100
-};
+
 
 exports.getTweet = function( req , res ) {
+
+    var params = {
+        screen_name :req.query.twitter,
+        count:100
+    };
+
     client.get('statuses/user_timeline', params, function(error, tweets, response) {
-        console.log( req );
+        if( error ){ console.log( error );}
         res.render( 'tweet', {
             tweet : tweets
         } );
