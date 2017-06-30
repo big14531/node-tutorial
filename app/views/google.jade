@@ -1,0 +1,17 @@
+html
+    head
+        title= title
+        link( href='/css/main.css' , rel='stylesheet' )
+    body
+        
+        div( ng-app='Hello' ng-controller='NameController' )
+            input( name='bigname' , type='text' , ng-model='bigname' )
+
+        - for (var i = 0; i < posts.length; ++i) {
+        p='------------------------'
+        ul
+
+        - }
+
+        script(type='text/javascript',src='/lib/angular/angular.min.js')
+        script(type='text/javascript',src='/application.js')
