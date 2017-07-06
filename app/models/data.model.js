@@ -12,7 +12,7 @@ mongoose.model( 'Facebook_object' , FB_DataSchema );
 
 var TT_DataSchema = new Schema({
     created_at      : Date,
-    tweet_id        : String,
+    _id             : String,
     tweet_type      : String,
     tweet_text      : String,
     create_by       : String,

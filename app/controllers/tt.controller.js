@@ -35,8 +35,8 @@ exports.getTweet = function( req , res , next ) {
 
     // Set Param
     var params = {
-        screen_name :req.query.twitter,
-        count:10
+        screen_name :"blognone",
+        count:450 /** Max call per 15 mins */
     };
 
     // Get Data and injection function1
@@ -48,8 +48,8 @@ exports.getTweet = function( req , res , next ) {
             var tweet = tweets[i];
             var data =
             {
+                _id             : tweet.id_str,
                 created_at      : tweet.created_at,
-                tweet_id        : tweet.id_str,
                 tweet_text      : tweet.text,
                 create_by       : tweet.user.id_str,
                 create_by_id    : tweet.user.screen_name,
@@ -60,19 +60,11 @@ exports.getTweet = function( req , res , next ) {
                 geo             : tweet.geo,
                 url             : "https://twitter.com/"+tweet.user.id_str+"/status/"+tweet.id_str
             };
-            tweet_array.push( data );
+            // var social_object = new social_db( data );
+            // social_object.save();
+            // tweet_array.push( data );
         } 
-        // var social_object = new social_db( tweet_array );
-        try {
-            social_db.updateMany(
-                { tweet_id  : tweet_array.tweet_id},
-                { $set      : tweet_array },
-                { upsert    : true }
-            );
-        } catch (e) {
-            console.log( e );
-        }
-        console.log( "Total Get Tweet : "+tweet_array.length );
+        console.log( "Total Get Tweet : "+tweets.length );
     });
 };
 
@@ -80,7 +72,6 @@ exports.getTweet = function( req , res , next ) {
  * Function get tweet from api
  */
 function getTimelinebyName( params , callback) {
-
     client.get('statuses/user_timeline', params, function(error, tweets, response) {
         if( error ){ 
             console.log( error );

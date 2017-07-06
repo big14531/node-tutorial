@@ -6,13 +6,13 @@ div( class="container" )
             button( class="btn btn-default" , value='search' , type='submit' ) Submit
 
     - for (var i = 0; i < tweet.length; ++i) {
-    div( class="well" )
-        ul
-            li= tweet[i].created_at
-            li= tweet[i].text
-            li= tweet[i].retweet_count
-            li 
-                a( href="https://twitter.com/"+tweet[i].user.id+"/status/"+tweet[i].id target='_blank') link
+        div( class="well well-sm" )
+            ul
+                li= tweet[i].created_at
+                li= tweet[i].text
+                li= tweet[i].retweet_count
+                li 
+                    a( href="https://twitter.com/"+tweet[i].user.id_str+"/status/"+tweet[i].id_str target='_blank') link
     - }
 
 include lib        
