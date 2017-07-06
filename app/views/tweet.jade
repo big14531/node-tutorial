@@ -1,26 +1,19 @@
-html
-    head
-        title= title
-        link( href='/css/main.css' , rel='stylesheet' )
-    body
-        
-        form( name='tweet_name' , method='GET' action='getTweet' )
-            div
-                label( for='twitter' ) Twitter
-                input( name='twitter' , placeholder='twitter here' )
-            div
-                input( value='search' , type='submit' )
+include header
+div( class="container" )      
+    form( name='tweet_name' , method='GET', action='searchTweet' , role="search")
+        div( class="form-group" )
+            input( class="form-control" , name='twitter' , placeholder='twitter here' )
+            button( class="btn btn-default" , value='search' , type='submit' ) Submit
 
-
-        - for (var i = 0; i < tweet.length; ++i) {
-        p='------------------------'
+    - for (var i = 0; i < tweet.length; ++i) {
+    div( class="well" )
         ul
             li= tweet[i].created_at
             li= tweet[i].text
             li= tweet[i].retweet_count
             li 
                 a( href="https://twitter.com/"+tweet[i].user.id+"/status/"+tweet[i].id target='_blank') link
-        - }
+    - }
 
-        script(type='text/javascript',src='/lib/angular/angular.min.js')
-        script(type='text/javascript',src='/application.js')
+include lib        
+script(type='text/javascript',src='/application.js')
