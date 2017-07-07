@@ -11,9 +11,9 @@ var client = new Twitter({
 
 
 /**
- * Function search tweet by name
+ * Function get tweet by name
  */
-exports.searchTweet = function( req , res ) {
+exports.getUserTweet = function( req , res ) {
     // Set Param
     var params = {
         screen_name :req.query.twitter,
@@ -28,27 +28,65 @@ exports.searchTweet = function( req , res ) {
     });
 };  
 
+
+/**
+ * Function search tweet by keyword
+ */
+exports.searchTweet = function( req , res ) {
+    // Set Param
+    var params = {
+        q : req.query.twitter,
+        // result_type : "popular"
+        result_type : "recent"
+    };
+
+    // Get Data and injection function
+    searchTweetByKeyword( params , function( tweets ) {
+        console.log( tweets );
+        res.render( 'tweet', {
+            tweet : tweets.statuses
+        }); 
+    });
+
+};  
+
 /**
  * Function get and save tweet to database
  */
 exports.getTweet = function( req , res , next ) {
 
     // Set Param
+    var max_id=null;
+    const limit = 3200;         /** Max tweet that api can acces */
     var params = {
-        screen_name :"blognone",
-        count:450 /** Max call per 15 mins */
+        screen_name :"9GAG",
+        include_rts :0,         /** Is Include Retweet? */
+        count       :200        /** Max call per 15 mins */
     };
-
+ 
     // Get Data and injection function1
-    getTimelinebyName( params , function( tweets ) {
+    getTimelinebyName( limit , params , callbackGetTimeline );
+    
+};
 
-        var tweet_array = [];
+/**
+ *  Function callback for get all timeline tweet
+ * 
+ * @param {* Max tweet that can get : 3200} limit 
+ * @param {* Param for API} params 
+ * @param {* Tweet list } tweets 
+ */
+function callbackGetTimeline( limit , params , tweets ) {
+    if ( params.count > limit ) {
+        return;
+    }
+    var tweet_array = [];
         for (var i = 0, len = tweets.length; i < len; i++) 
         {
             var tweet = tweets[i];
             var data =
             {
-                _id             : tweet.id_str,
+                _id             : tweet.id_str,     /** If this exist , not insert to mongooo!!!! */
                 created_at      : tweet.created_at,
                 tweet_text      : tweet.text,
                 create_by       : tweet.user.id_str,
@@ -60,23 +98,47 @@ exports.getTweet = function( req , res , next ) {
                 geo             : tweet.geo,
                 url             : "https://twitter.com/"+tweet.user.id_str+"/status/"+tweet.id_str
             };
+            console.log( data );
             // var social_object = new social_db( data );
             // social_object.save();
             // tweet_array.push( data );
         } 
-        console.log( "Total Get Tweet : "+tweets.length );
-    });
-};
+        
+    console.log( "Date : "+tweets[tweets.length-1].created_at );
+    console.log( "Total Get Tweet : "+tweets.length );
+    console.log( "===========" );
+
+    // Set New Max_id and count
+    params.max_id = tweets[tweets.length-1].id_str;
+    params.count += 200;
+
+    // Call itself again , inject new max_id and new count
+    getTimelinebyName( limit , params , callbackGetTimeline );
+}
+
 
 /**
  * Function get tweet from api
  */
-function getTimelinebyName( params , callback) {
+function getTimelinebyName( limit , params , callback) {
     client.get('statuses/user_timeline', params, function(error, tweets, response) {
+        if( error ){ 
+            console.log( error );
+        }
+        callback( limit , params , tweets )
+    });
+    
+}
+
+
+/**
+ * Function search tweet from keyword
+ */
+function searchTweetByKeyword( params , callback ) {
+    client.get('search/tweets', params , function(error, tweets, response) {
         if( error ){ 
             console.log( error );
         }
         callback( tweets )
     });
-    
 }

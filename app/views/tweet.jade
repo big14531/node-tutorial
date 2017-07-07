@@ -1,10 +1,18 @@
 include header
-div( class="container" )      
-    form( name='tweet_name' , method='GET', action='searchTweet' , role="search")
-        div( class="form-group" )
-            input( class="form-control" , name='twitter' , placeholder='twitter here' )
-            button( class="btn btn-default" , value='search' , type='submit' ) Submit
+div.container
+    div.col-lg-6
+        form( name='tweet_name' , method='GET', action='getUserTweet' , role="search")
+            div( class="form-group" )
+                input( class="form-control" , name='twitter' , placeholder='twitter account' )
 
+                button.btn.btn-default( value='search' , type='submit' ) Get Tweet
+    div.col-lg-6
+        form( name='tweet_name' , method='GET', action='searchTweet' , role="search")
+            div( class="form-group" )
+                input( class="form-control" , name='twitter' , placeholder='keyword' )
+
+                button.btn.btn-default( value='search' , type='submit' ) Search Tweet
+    div.row
     - for (var i = 0; i < tweet.length; ++i) {
         div( class="well well-sm" )
             ul

@@ -16,6 +16,7 @@ module.exports = function (app) {
     app.get( '/extendToken' , fb.extendToken );
 
     // TWITTER ROUTE
+    app.get( '/getUserTweet' , tt.getUserTweet );
     app.get( '/searchTweet' , tt.searchTweet );
     app.get( '/getTweet' , tt.getTweet );
     // GOOGLE ROUTE

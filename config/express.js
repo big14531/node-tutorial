@@ -8,6 +8,7 @@ var sass = require( 'node-sass-middleware' );
 var expressValidator = require( 'express-validator' );
 var cookieSession = require( 'cookie-session' );
 var cookieSession = require( 'mongoose' );
+
 // Setting express App
 module.exports = function () {
     var app = express();
