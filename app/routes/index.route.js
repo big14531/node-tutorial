@@ -19,8 +19,9 @@ module.exports = function (app) {
     app.get( '/getUserTweet' , tt.getUserTweet );
     app.get( '/searchTweet' , tt.searchTweet );
     app.get( '/getTweet' , tt.getTweet );
+
     // GOOGLE ROUTE
-    app.get( '/getGoogle' , gg.getTrends );   
+    app.get( '/getTrends' , gg.getTrends );   
     
 }
 

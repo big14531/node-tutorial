@@ -15,13 +15,14 @@ var client = new Twitter({
  */
 exports.getUserTweet = function( req , res ) {
     // Set Param
+
     var params = {
-        screen_name :req.query.twitter,
-        count:100
+        screen_name :req.query.twitter||'me',
+        count:200
     };
 
     // Get Data and injection function
-    getTimelinebyName( params , function( tweets ) {
+    getTimelinebyName( limit=0 , params , function( limit , params ,tweets ) {
         res.render( 'tweet', {
             tweet : tweets
         }); 
@@ -35,7 +36,7 @@ exports.getUserTweet = function( req , res ) {
 exports.searchTweet = function( req , res ) {
     // Set Param
     var params = {
-        q : req.query.twitter,
+        q : req.query.twitter||'me',
         // result_type : "popular"
         result_type : "recent"
     };
@@ -60,7 +61,8 @@ exports.getTweet = function( req , res , next ) {
     const limit = 3200;         /** Max tweet that api can acces */
     var params = {
         screen_name :"9GAG",
-        include_rts :0,         /** Is Include Retweet? */
+        trim_user   :false,
+        include_rts :false,         /** Is Include Retweet? */
         count       :200        /** Max call per 15 mins */
     };
  
