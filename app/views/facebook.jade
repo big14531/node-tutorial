@@ -1,19 +1,13 @@
-html
-    head
-        title= title
-        link( href='/css/main.css' , rel='stylesheet' )
-    body
-        
-        div( ng-app='Hello' ng-controller='NameController' )
-            input( name='bigname' , type='text' , ng-model='bigname' )
-
-        - for (var i = 0; i < posts.length; ++i) {
-        p='------------------------'
-        ul
-            li= posts[i].created_time
-            li= posts[i].name
-            li= posts[i].description
-        - }
-
-        script(type='text/javascript',src='/lib/angular/angular.min.js')
-        script(type='text/javascript',src='/application.js')
+include header
+div( ng-app='Hello' ng-controller='NameController' )
+    div.row
+        div.col-lg-6.col-lg-offset-3
+            - for (var i = 0; i < posts.length; ++i) {
+            div( class="well well-sm" )
+                ul
+                    li= posts[i].created_time
+                    li= posts[i].name
+                    li= posts[i].description
+            - }
+include lib        
+script(type='text/javascript',src='/application.js')

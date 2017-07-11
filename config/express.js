@@ -40,6 +40,7 @@ module.exports = function () {
         debug:true
     }));
 
+    // เรียกใช้ Static File เช่น css ,js ,jpg 
     app.use( express.static( './public' ) );
     return app;
 }

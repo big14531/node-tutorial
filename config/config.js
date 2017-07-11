@@ -3,7 +3,8 @@ module.exports = {
     'facebookAuth' : {
         fb_client_id : '1258184930930443',
         fb_secert_id : '248a0cbd709f8b2f26bc0e5002969db8',
-        fb_access_token : "EAACEdEose0cBAA6RyMo9R1g9Ma4bPlZB29irwLGnO9QQitp2kZCUIX0DrFljdloSI8H4tXjoO9gAjAjxZCmCHWH9bfBTYtLd29aODBWfyb1Ce0knUNkV4m90BeXsQP7mwrF3Ftz3ZC9SdQpWbyfG4zKFuDgvVhuESQxDs0aAcMgKvaIpoQBBsVIy2RboORQZD"
+        fb_access_token : "1258184930930443|QsJ3Sq53jAc3DYbXMNW4B8BxF0E"
+        
     },
 
     'twitterAuth' : {

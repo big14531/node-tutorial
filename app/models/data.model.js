@@ -3,10 +3,16 @@ var Schema = mongoose.Schema;
 
 var FB_DataSchema = new Schema({
     created_at      : Date,
-    fb_id           : String,
-    create_by       : String,
-    lang            : String,
-    geo             : String
+    _id             : String,
+    post_id         : String,
+    page_id         : String,
+    name            : String,
+    type            : String,    
+    message         : String,
+    description     : String,
+    link            : String,
+    permarklink     : String,
+    reaction        : String
 });
 mongoose.model( 'Facebook_object' , FB_DataSchema );
 

@@ -20,6 +20,7 @@
     "express": "^4.15.3",
     "express-validator": "~2.14.0",
     "fb": "^2.0.0",
+    "fbgraph": "^1.4.1",
     "google-trends-api-es": "^1.2.6",
     "jade": "~1.11.0",
     "mongodb": "^2.2.28",
