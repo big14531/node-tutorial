@@ -3,7 +3,7 @@
 var mainAppModule = angular.module( 'Hello',[] );
 
 mainAppModule.controller( 'NameController' , ['$scope' , function ($scope) {
-    $scope.bigname ='wwawawawawa';
+    $scope.bigname ='big';
 }]);
 
 mainAppModule.filter( 'sayhello' , function() {

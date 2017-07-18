@@ -6,20 +6,17 @@ module.exports = function (app) {
     var gg = require( '../controllers/gg.controller' );
     // INDEX ROUTE
     app.get( '/' , index.render );
-    
-    // USER ROUTE    
-    app.post( '/login'  , user.login );
-    app.post( '/logout' , user.logout );   
 
     // FACEBOOK ROUTE
-    app.get( '/getFbPost'   , fb.getFbPost );
+    app.get( '/facebook'   , fb.getFbPost );
     app.get( '/extendToken' , fb.extendToken );
 
     // TWITTER ROUTE
     app.get( '/getUserTweet' , tt.getUserTweet );
     app.get( '/searchTweet' , tt.searchTweet );
     app.get( '/getTweet' , tt.getTweet );
-
+    app.get( '/getUser' , tt.getUser );
+    
     // GOOGLE ROUTE
     app.get( '/getTrends' , gg.getTrends );   
     

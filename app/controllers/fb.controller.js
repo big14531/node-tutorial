@@ -1,7 +1,7 @@
 var FB = require('fb');
 var graph = require('fbgraph');
 var curl = require('curl');
-var social_db = require( 'mongoose' ).model( 'Facebook_object' );
+var social_db = require( 'mongoose' ).model( 'fb_post_collection' );
 var config = require( '../../config/config' );
 
 FB.setAccessToken(config.facebookAuth.fb_access_token);
@@ -14,12 +14,12 @@ exports.extendToken = function( req , res ){
 }
 
 exports.getFbPost = function( req , res ){
-    var page = 'DramaAdd/feed';
+    var page = 'DramaAdd/feed?fields=message,shares,reations.type(LIKE).summary(totalCount)';
     var param = { 
-        fields:'created_time , id , name , type , message , description , link' ,
-        limit:100
+        fields:'created_time , id , name , type , message , description , link , permalink_url ' ,
+        limit:1
     };
-    var count = 100;
+    var count = 2;
 
     getPostsbyPageParamNumber( page , param , count , function ( data ) {
         for (var i = 0, len = data.length; i < len; i++) 
@@ -36,8 +36,7 @@ exports.getFbPost = function( req , res ){
             //     message         :         
             //     description     :            
             //     link            :         
-            //     permarklink     :           
-            //     reaction        :           
+            //     permarlink     :            
             // };
             console.log( post );
             // var social_object = new social_db( data );
@@ -48,16 +47,18 @@ exports.getFbPost = function( req , res ){
 }
 
 function getPostsbyPageParamNumber( page , param , count=0 , callback) {
-    graph.get( page , param, function(err, res) {
+
+    graph.get( page, function(err, res) {
         callback( res.data );
         if(res.paging && res.paging.next) {
             graph.get(res.paging.next, function(err, res) {
                 
-                 
+                
             });
         }
-       
+    
     });
+    
     
 }
 // exports.getFbPost = function( req , res ){
