@@ -78,7 +78,7 @@ exports.getTweet = function( req , res , next ) {
 };
 
 /**
-* Function get user data from screen and or id
+* Function get user data from screen and or id , can select multiple user 
 */
 exports.getUser = function( req , res , next ) {
 
@@ -87,7 +87,7 @@ exports.getUser = function( req , res , next ) {
     const limit = 3200;                /** Max tweet that api can acces*/
 
     var params = {
-        screen_name :"Chanokporn"
+        screen_name :"Chanokporn,9GAG"
     };
  
     // Get Data and injection function1
@@ -181,7 +181,7 @@ function getTimelinebyName( limit , params , callback) {
 *
 */
 function getUserData( params , callback ) {
-    client.get('users/show', params, function(error, user, response) {
+    client.get('users/lookup', params, function(error, user, response) {
         if( error ){ 
             console.log( error );
         }
@@ -190,9 +190,27 @@ function getUserData( params , callback ) {
 }
 
 /**
-* Function search tweet from keyword
-*/
+ * Function search tweet from keyword
+ * 
+ * @param {*} params 
+ * @param {*} callback 
+ */
 function searchTweetByKeyword( params , callback ) {
+    client.get('search/tweets', params , function(error, tweets, response) {
+        if( error ){ 
+            console.log( error );
+        }
+        callback( tweets )
+    });
+}
+
+/**
+ * Function get follower data or follower id from user_id or screen_name
+ * 
+ * @param {*} params 
+ * @param {*} callback 
+ */
+function getFollowerData( params , callback) {
     client.get('search/tweets', params , function(error, tweets, response) {
         if( error ){ 
             console.log( error );
