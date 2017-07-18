@@ -13,6 +13,7 @@
   "author": "bigtoi",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.5.0",
     "body-parser": "~1.13.0",
     "compression": "~1.5.0",
     "cookie-session": "~1.2.0",

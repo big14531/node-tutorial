@@ -13,4 +13,4 @@ module.exports = {
         'access_token_key'      : '2671886117-R2hV6oDxiVZynNSBSVt1Ja64EXbO8bC5PO6O2b6',
         'access_token_secret'   : 'R6sBu2n8sWUMXs2Tl5n8BJ48oHleZe9cza68LY7CphHuo'
     }
-   };
+};

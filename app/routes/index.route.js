@@ -8,8 +8,7 @@ module.exports = function (app) {
     app.get( '/' , index.render );
 
     // FACEBOOK ROUTE
-    app.get( '/facebook'   , fb.getFbPost );
-    app.get( '/extendToken' , fb.extendToken );
+    app.get( '/getPosts'   , fb.getPosts );
 
     // TWITTER ROUTE
     app.get( '/getUserTweet' , tt.getUserTweet );

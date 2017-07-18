@@ -1,92 +1,103 @@
 var FB = require('fb');
+var async = require('async');
 var graph = require('fbgraph');
-var curl = require('curl');
 var social_db = require( 'mongoose' ).model( 'fb_post_collection' );
 var config = require( '../../config/config' );
-
 FB.setAccessToken(config.facebookAuth.fb_access_token);
-graph.setAccessToken(config.facebookAuth.fb_access_token);
 
 FB.options({version: 'v2.9'});
 
-exports.extendToken = function( req , res ){
-    console.log( 'accessToken' );
-}
+exports.getPosts = function( req , res ){
 
-exports.getFbPost = function( req , res ){
-    var page = 'DramaAdd/feed?fields=message,shares,reations.type(LIKE).summary(totalCount)';
-    var param = { 
-        fields:'created_time , id , name , type , message , description , link , permalink_url ' ,
-        limit:1
-    };
-    var count = 2;
+    // Set Param and page
+    var page = 'DramaAdd/feed';
+    var params = {
+        fields: [
+            'id', 
+            'name',
+            'created_time',
+            'description' , 
+            'likes.limit(1).summary(true)'  ],
+        limit:2
+    }
+    var max_count = 10;
 
-    getPostsbyPageParamNumber( page , param , count , function ( data ) {
-        for (var i = 0, len = data.length; i < len; i++) 
-        {
-            var post = data[i];
-            // var data =
-            // {
-            //     created_at      : post.id_str,     /** If this exist , not insert to mongooo!!!! */
-            //     _id             : post.created_at,
-            //     post_id         : post.text,
-            //     page_id         : post.user.id_str,
-            //     name            : "https://twitter.com/"+tweet.user.id_str+"/status/"+tweet.id_str,
-            //     type            :
-            //     message         :         
-            //     description     :            
-            //     link            :         
-            //     permarlink     :            
-            // };
-            console.log( post );
-            // var social_object = new social_db( data );
-            // social_object.save();
-            // tweet_array.push( data );
-        } 
+    /**
+     *  async description
+     *  1. getAccessToken and pass param to getPostbyParam
+     *  2. getPostbyParam got "access_token" and "error" from getAccessToken , and inject "Param" by apply
+     *  3. 
+     */
+    async.waterfall([
+        getAccessToken,
+        async.apply( getPostbyParam, [ page , params , max_count ] ),
+    ], function (err, result) {
+        console.log( result );
     });
+
+    
 }
 
-function getPostsbyPageParamNumber( page , param , count=0 , callback) {
-
-    graph.get( page, function(err, res) {
-        callback( res.data );
-        if(res.paging && res.paging.next) {
-            graph.get(res.paging.next, function(err, res) {
-                
-                
-            });
+/**
+ *  Function call facebook api endpoint and get data by param
+ * 
+ * @param {*} param         =>  Inject from async.waterfall  ( field , count , limit )
+ * @param {*} error         =>  Get from before funciton
+ * @param {*} access_token  =>  Access token
+ * @param {*} callback      =>  Callback for something
+ */
+function getPostbyParam( param_array , error , access_token , callback ) {
+    var page    = param_array[0];
+    var param   = param_array[1];
+    var count   = param_array[2];
+    FB.api( page , param , function (res) {
+        if(!res || res.error) {
+            console.log(!res ? 'error occurred' : res.error);
+            return;
         }
-    
+        console.log( res.data );
+        recursivePost( res , param_array , count );
     });
     
-    
+    callback( null ,"Done!!");
 }
-// exports.getFbPost = function( req , res ){
-//     FB.api('DramaAdd/feed', { fields: ['id', 'name','created_time','description'] , limit:100 }, function (fb_res) {    
-//         if(!fb_res || fb_res.error) {
-//             console.log(!fb_res ? 'error occurred' : fb_res.error);
-//             return;
-//         }
 
-//         res.render( 'facebook', {
-//             posts : fb_res.data
-//         } );
-//         curlGetJson( fb_res.paging.next , fb_res.data.length , res , function(response){
-//             console.log( response );
-//         });
-//     });
-// }
 
-// function curlGetJson( previous_link , count , res ,  callback ) {
-//     curl.getJSON( previous_link , {} , function(err, response, data , res ){
-//         if( !data.paging ){
-//             callback( 'Done Total count  : '+count );
-//             return;
-//         }
-//         new_count = count+data.data.length;
-//         callback( data.data[0].created_time );
-//         callback( 'count  : '+count );
-//         curlGetJson( data.paging.next ,new_count, callback );
-//     });
-// }
+/**
+ *  Function recursive for getPost
+ * @param {*} res           =>  respond object from API
+ * @param {*} param_array   =>  query field
+ * @param {*} count         =>  Counter number , stop recursive when equal 0
+ */
+function recursivePost( res , param_array , count ) {
+    if( count<=0 ) return;
+    graph.get( res.paging.next , function (err,res) {
+        if(!res || err) {
+            console.log(!res ? 'error occurred' : err);
+            return;
+        }
+        console.log( res.data );
+        count -= param_array[1].limit;
+        recursivePost( res , param_array , count );
+    });
+   
+}
+
+/**
+ * Function get access Token by facebook client_id and secert_id 
+ */
+function getAccessToken( callback ) {
+    FB.api('oauth/access_token', {
+        client_id       : config.facebookAuth.fb_client_id,
+        client_secret   : config.facebookAuth.fb_secert_id,
+        grant_type: 'client_credentials'
+        }, function (res) {
+            if(!res || res.error) {
+                console.log(!res ? 'error occurred' : res.error);
+                return;
+            }   
+            callback( null , res.error , res.access_token );
+    });
+}
+
 
