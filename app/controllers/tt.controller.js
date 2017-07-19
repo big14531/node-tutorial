@@ -190,11 +190,11 @@ function getUserData( params , callback ) {
 }
 
 /**
- * Function search tweet from keyword
- * 
- * @param {*} params 
- * @param {*} callback 
- */
+* Function search tweet from keyword
+* 
+* @param {*} params 
+* @param {*} callback 
+*/
 function searchTweetByKeyword( params , callback ) {
     client.get('search/tweets', params , function(error, tweets, response) {
         if( error ){ 
@@ -205,11 +205,11 @@ function searchTweetByKeyword( params , callback ) {
 }
 
 /**
- * Function get follower data or follower id from user_id or screen_name
- * 
- * @param {*} params 
- * @param {*} callback 
- */
+* Function get follower data or follower id from user_id or screen_name
+* 
+* @param {*} params 
+* @param {*} callback 
+*/
 function getFollowerData( params , callback) {
     client.get('search/tweets', params , function(error, tweets, response) {
         if( error ){ 

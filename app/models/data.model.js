@@ -12,34 +12,39 @@ var Schema = mongoose.Schema;
  */
 var fb_post_schema = new Schema({
     created_at      : Date,
-    _id             : String,
-    post_id         : String,
-    page_id         : String,
-    name            : String,
-    type            : String,    
-    message         : String,
-    description     : String,
-    link            : String,
-    permarklink     : String,
-    reaction        : String
+    id              : { type : String , unique : true, required : true, dropDups: false },
+    post_id         : { type : String },
+    page_id         : { type : String },
+    name            : { type : String },
+    type            : { type : String },    
+    picture         : { type : String },
+    object_id       : { type : String },
+    link            : { type : String },
+    permalink_url   : { type : String },
+    message         : { type : String },
+    description     : { type : String },
+    likes           : { type : JSON },
+    comments        : { type : JSON },
+    reactions       : { type : JSON },
+    shares          : { type : JSON },
+    is_delete       : { type : Boolean }
 });
 
-var fb_page_schema = new Schema({
-    created_at      : Date,
-    _id             : String,
-    post_id         : String,
-    page_id         : String,
-    name            : String,
-    type            : String,    
-    message         : String,
-    description     : String,
-    link            : String,
-    permarklink     : String,
-    reaction        : String
-});
+// var fb_page_schema = new Schema({
+//     created_at      : Date,
+//     post_id         : String,
+//     page_id         : String,
+//     name            : String,
+//     type            : String,    
+//     message         : String,
+//     description     : String,
+//     link            : String,
+//     permarklink     : String,
+//     reaction        : String
+// });
 
-mongoose.model( 'fb_post_collection' , fb_post_schema );
-mongoose.model( 'fb_page_collection' , fb_page_schema );
+let fb_post_model = mongoose.model( 'fb_post_collection' , fb_post_schema );
+// let fb_page_model = mongoose.model( 'fb_page_collection' , fb_page_schema );
 
 
 /**
@@ -78,3 +83,17 @@ var tt_user_schema = new Schema({
 
 mongoose.model( 'tt_tweet_collection' , tt_tweet_schema );
 mongoose.model( 'tt_user_collection' , tt_user_schema );
+
+exports.insertPostFacebook = function( data ){
+
+    data.forEach(function(item) {
+        var social_object = new fb_post_model( item );
+        social_object.save(function(err){
+            if(err){
+                console.log(err);
+                return err;
+            }
+        });
+    });
+    console.log('Save Complete : '+data.length);
+};
