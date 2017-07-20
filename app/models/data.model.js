@@ -128,14 +128,12 @@ exports.insertPageFacebook = function( data ){
 };
 
 
-exports.getPostFacebook = function( query ){
+exports.getPostFacebook = function( query , callback ){
     fb_post_model.aggregate( 
-        [
-            { $match : { 'from.id' : '129558990394402' }},
-            { $limit : 1 } 
-        ],
-        function(err,result){ 
-            console.log(result) 
+        query,
+        function(err,result){
+            callback( result );
+            return result;
         } 
     );
 }

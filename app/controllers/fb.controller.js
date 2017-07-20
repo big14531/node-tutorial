@@ -97,30 +97,32 @@ exports.savePageAPI = function( req , res ){
 }
 
 /**
-*  Function get Post by page_name , min_date , max_date , count
+*  Function get Post by id , min_date , max_date , count
 * 
 */
 exports.getPosts = function ( req , res ) {
-    var page_name   = req.query.page_name;
+    var id   = req.query.id;
     var min_date    = req.query.min_date;
     var max_date    = req.query.max_date;
     var count       = req.query.count;
 
     var query = [
-        { $match : { 'from.id'      : req.query.page_name }},
-        { $match : { created_time   : {$gt: new Date(req.query.min_date).toISOString() }}},
-        { $match : { created_time   : {$lt: new Date(req.query.max_date).toISOString() }}},
-        { $limit : req.query.count } 
+        { $match : { 'from.id'      : req.query.id }},
+        { $match : { created_time   : {$gt: new Date(req.query.min_date) }}},
+        { $match : { created_time   : {$lt: new Date(req.query.max_date) }}},
+        { $limit : parseInt( req.query.count ) } 
     ];
     /**
     *  async description
     *  1. get Post from mongo by param
-    *  2. res.json for display 
+    *  2. injection query and callback for render json to screen
+    *       **Closure with res
     */
+    console.log( query );
     async.waterfall([
-        async.apply( getPostsfromDB, query ),
+        async.apply( getPostsfromDB, [query ,  function(data){ res.json(data); }] )
     ], function (err, result) {
-        res.json( result );
+        console.log( 'Show' );
     });  
 }
 
@@ -216,8 +218,12 @@ function getAccessToken( callback ) {
     });
 }
 
-
+/**
+ * 
+ * @param {*} query 
+ * @param {*} callback 
+ */
 function getPostsfromDB( query , callback ){
-    var result = model.getPostFacebook( query )
-    callback( null ,result );
+    var result = model.getPostFacebook( query[0] , query[1] )
+    callback( null , result );
 }
