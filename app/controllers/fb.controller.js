@@ -7,16 +7,17 @@ var config = require( '../../config/config' );
 FB.options({version: 'v2.9'});
 
 /**
- *  Function get Post facebook posts
- * 
- */
+*  Function get Post facebook data
+* 
+*/
 exports.getPosts = function( req , res ){
 
     // Set Param and page
-    var page = 'pantipdotcom/feed';
+    var page = 'khaosod/feed';
     var params = {
         fields: [
             'created_time',
+            'from',
             'id', 
             'name',
             'type',
@@ -26,6 +27,9 @@ exports.getPosts = function( req , res ){
             'permalink_url',
             'message',
             'description' , 
+            'message_tags',
+            'place',
+            'feed_targeting',
             'likes.limit(1).summary(true)',
             'reactions.limit(1).summary(true)',
             'comments.limit(1).summary(true)',
@@ -35,11 +39,11 @@ exports.getPosts = function( req , res ){
     var max_count = 1000;
 
     /**
-     *  async description
-     *  1. getAccessToken and pass param to getPostbyParam
-     *  2. getPostbyParam got "access_token" and "error" from getAccessToken , and inject "Param" by apply
-     *  3. 
-     */
+    *  async description
+    *  1. getAccessToken and pass param to getPostbyParam
+    *  2. getPostbyParam got "access_token" and "error" from getAccessToken , and inject "Param" by apply
+    *  3. 
+    */
     async.waterfall([
         getAccessToken,
         async.apply( getPostbyParam, [ page , params , max_count ] ),
@@ -50,16 +54,54 @@ exports.getPosts = function( req , res ){
     
 }
 
-exports.updateLike = function( req , res ){
+/**
+*  Function get Page facebook data
+* 
+*/
+exports.getPage = function( req , res ){
 
+    // Set Param and page
+    var page = 'khaosod';
+    var params = {
+        fields: [
+            'about',
+            'fan_count',
+            'category_list',
+            'link',
+            'website',
+            'cover',
+            'name',
+            'category',
+            'displayed_message_response_time',
+            'engagement',
+            'is_verified',
+            'verification_status',
+            'location',
+            'talking_about_count',
+            'picture'
+        ]
+    }
+
+    /**
+    *  async description
+    *  1. getAccessToken and pass param to getPostbyParam
+    *  2. getPostbyParam got "access_token" and "error" from getAccessToken , and inject "Param" by apply
+    *  3. 
+    */
+    async.waterfall([
+        getAccessToken,
+        async.apply( getPagebyParam, [ page , params ] ),
+    ], function (err, result) {
+        res.json({ status: 'Done' });
+    });   
 }
 
+
 /**
-*  Function call facebook api endpoint and get data by param
+*  Function call facebook api endpoint for get post data and recursive paging
 * 
 * @param {*} param         =>  Inject from async.waterfall  ( field , count , limit )
 * @param {*} error         =>  Get from before funciton
-* @param {*} access_token  =>  Access token
 * @param {*} callback      =>  Callback for something
 */
 function getPostbyParam( param_array , error , callback ) {
@@ -77,7 +119,6 @@ function getPostbyParam( param_array , error , callback ) {
     
     callback( null ,"Done!!");
 }
-
 
 /**
 *  Function recursive for getPost
@@ -97,6 +138,31 @@ function recursivePost( res , param_array , count ) {
         recursivePost( res , param_array , count );
     });
 }
+
+
+/**
+*  Function call facebook api endpoint for get Page data
+* 
+* @param {*} param         =>  Inject from async.waterfall  ( field , count , limit )
+* @param {*} error         =>  Get from before funciton
+* @param {*} callback      =>  Callback for something
+*/
+function getPagebyParam( param_array , error , callback ) {
+    var page    = param_array[0];
+    var param   = param_array[1];
+    FB.api( page , param , function (res) {
+        if(!res || res.error) {
+            console.log(!res ? 'error occurred' : res.error);
+            return;
+        }
+        console.log( res )
+        model.insertPageFacebook( res );
+    });
+    
+    callback( null ,"Done!!");
+}
+
+
 
 /**
 * Function get access Token by facebook client_id and secert_id 

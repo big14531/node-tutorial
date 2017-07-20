@@ -3,7 +3,6 @@ module.exports = {
     'facebookAuth' : {
         fb_client_id : '1258184930930443',
         fb_secert_id : '248a0cbd709f8b2f26bc0e5002969db8',
-        fb_access_token : "1258184930930443|QsJ3Sq53jAc3DYbXMNW4B8BxF0E"
     },
 
     'twitterAuth' : {

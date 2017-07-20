@@ -9,7 +9,7 @@ module.exports = function (app) {
 
     // FACEBOOK ROUTE
     app.get( '/getPosts'   , fb.getPosts );
-
+    app.get( '/getPage'   , fb.getPage );
     // TWITTER ROUTE
     app.get( '/getUserTweet' , tt.getUserTweet );
     app.get( '/searchTweet' , tt.searchTweet );
