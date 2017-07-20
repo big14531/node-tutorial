@@ -11,7 +11,7 @@ var Schema = mongoose.Schema;
 * 
 */
 var fb_post_schema = new Schema({
-    created_at      : Date,
+    created_time    : Date,
     from            : { type : Object },
     id              : { type : String , unique : true, required : true, dropDups: false },
     post_id         : { type : String },
@@ -48,7 +48,7 @@ var fb_page_schema = new Schema({
 	engagement                      : { type : JSON },
 	is_verified                     : { type : String },
 	verification_status             : { type : String },
-	location                        : { type : String },
+	location                        : { type : JSON },
 	talking_about_count             : { type : String },
 	picture                         : { type : JSON } 
 });
@@ -98,9 +98,7 @@ mongoose.model( 'tt_tweet_collection' , tt_tweet_schema );
 mongoose.model( 'tt_user_collection' , tt_user_schema );
 
 exports.insertPostFacebook = function( data ){
-
     data.forEach(function(item) {
-        console.log(item);
         fb_post_model.update(
             { id : item.id },
             { $set : item },
@@ -110,26 +108,13 @@ exports.insertPostFacebook = function( data ){
             }
         );
     });
-    console.log('Save Complete : '+data.length);
+    console.log('Save Post Complete : '+data.length);
 };
 
 /**
 * 
 * 
 */
-exports.insertPageFacebook = function( data ){
-    console.log(item);
-    fb_post_model.update(
-        { id : item.id },
-        { $set : item },
-        { upsert : true },
-        function(err){
-            if(err) console.log(err);
-        }
-    );
-    console.log('Save Complete');
-};
-
 exports.insertPageFacebook = function( data ){
     fb_page_model.update(
         { id : data.id },
@@ -141,3 +126,16 @@ exports.insertPageFacebook = function( data ){
     );
     console.log('Save Complete');
 };
+
+
+exports.getPostFacebook = function( query ){
+    fb_post_model.aggregate( 
+        [
+            { $match : { 'from.id' : '129558990394402' }},
+            { $limit : 1 } 
+        ],
+        function(err,result){ 
+            console.log(result) 
+        } 
+    );
+}

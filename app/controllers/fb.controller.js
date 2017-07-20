@@ -7,13 +7,13 @@ var config = require( '../../config/config' );
 FB.options({version: 'v2.9'});
 
 /**
-*  Function get Post facebook data
+*  Function pull Post  from api and update to db
 * 
 */
-exports.getPosts = function( req , res ){
+exports.savePostsAPI = function( req , res ){
 
     // Set Param and page
-    var page = 'khaosod/feed';
+    var page = req.query.page_name+'/feed';
     var params = {
         fields: [
             'created_time',
@@ -40,13 +40,13 @@ exports.getPosts = function( req , res ){
 
     /**
     *  async description
-    *  1. getAccessToken and pass param to getPostbyParam
-    *  2. getPostbyParam got "access_token" and "error" from getAccessToken , and inject "Param" by apply
+    *  1. getAccessToken and pass param to pullPostfromAPI
+    *  2. pullPostfromAPI got "access_token" and "error" from getAccessToken , and inject "Param" by apply
     *  3. 
     */
     async.waterfall([
         getAccessToken,
-        async.apply( getPostbyParam, [ page , params , max_count ] ),
+        async.apply( pullPostfromAPI, [ page , params , max_count ] ),
     ], function (err, result) {
         res.json({ status: 'Done' });
     });
@@ -55,13 +55,13 @@ exports.getPosts = function( req , res ){
 }
 
 /**
-*  Function get Page facebook data
+*  Function pull Page  from api and update to db
 * 
 */
-exports.getPage = function( req , res ){
+exports.savePageAPI = function( req , res ){
 
     // Set Param and page
-    var page = 'khaosod';
+    var page = req.query.page_name;
     var params = {
         fields: [
             'about',
@@ -84,18 +84,53 @@ exports.getPage = function( req , res ){
 
     /**
     *  async description
-    *  1. getAccessToken and pass param to getPostbyParam
-    *  2. getPostbyParam got "access_token" and "error" from getAccessToken , and inject "Param" by apply
+    *  1. getAccessToken and pass param to pullPostfromAPI
+    *  2. pullPostfromAPI got "access_token" and "error" from getAccessToken , and inject "Param" by apply
     *  3. 
     */
     async.waterfall([
         getAccessToken,
-        async.apply( getPagebyParam, [ page , params ] ),
+        async.apply( pullPagefromAPI, [ page , params ] ),
     ], function (err, result) {
         res.json({ status: 'Done' });
     });   
 }
 
+/**
+*  Function get Post by page_name , min_date , max_date , count
+* 
+*/
+exports.getPosts = function ( req , res ) {
+    var page_name   = req.query.page_name;
+    var min_date    = req.query.min_date;
+    var max_date    = req.query.max_date;
+    var count       = req.query.count;
+
+    var query = [
+        { $match : { 'from.id'      : req.query.page_name }},
+        { $match : { created_time   : {$gt: new Date(req.query.min_date).toISOString() }}},
+        { $match : { created_time   : {$lt: new Date(req.query.max_date).toISOString() }}},
+        { $limit : req.query.count } 
+    ];
+    /**
+    *  async description
+    *  1. get Post from mongo by param
+    *  2. res.json for display 
+    */
+    async.waterfall([
+        async.apply( getPostsfromDB, query ),
+    ], function (err, result) {
+        res.json( result );
+    });  
+}
+
+/**
+*  Function get Page data by page_name
+* 
+*/
+exports.getPage = function ( req , res ) {
+    var page_name   = req.query.page_name;
+}
 
 /**
 *  Function call facebook api endpoint for get post data and recursive paging
@@ -104,7 +139,7 @@ exports.getPage = function( req , res ){
 * @param {*} error         =>  Get from before funciton
 * @param {*} callback      =>  Callback for something
 */
-function getPostbyParam( param_array , error , callback ) {
+function pullPostfromAPI( param_array , error , callback ) {
     var page    = param_array[0];
     var param   = param_array[1];
     var count   = param_array[2];
@@ -147,7 +182,7 @@ function recursivePost( res , param_array , count ) {
 * @param {*} error         =>  Get from before funciton
 * @param {*} callback      =>  Callback for something
 */
-function getPagebyParam( param_array , error , callback ) {
+function pullPagefromAPI( param_array , error , callback ) {
     var page    = param_array[0];
     var param   = param_array[1];
     FB.api( page , param , function (res) {
@@ -155,13 +190,11 @@ function getPagebyParam( param_array , error , callback ) {
             console.log(!res ? 'error occurred' : res.error);
             return;
         }
-        console.log( res )
         model.insertPageFacebook( res );
     });
     
     callback( null ,"Done!!");
 }
-
 
 
 /**
@@ -184,3 +217,7 @@ function getAccessToken( callback ) {
 }
 
 
+function getPostsfromDB( query , callback ){
+    var result = model.getPostFacebook( query )
+    callback( null ,result );
+}

@@ -8,6 +8,8 @@ module.exports = function (app) {
     app.get( '/' , index.render );
 
     // FACEBOOK ROUTE
+    app.get( '/savePostsAPI'   , fb.savePostsAPI );
+    app.get( '/savePageAPI'   , fb.savePageAPI );
     app.get( '/getPosts'   , fb.getPosts );
     app.get( '/getPage'   , fb.getPage );
     // TWITTER ROUTE
