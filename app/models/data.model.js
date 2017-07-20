@@ -112,7 +112,8 @@ exports.insertPostFacebook = function( data ){
 };
 
 /**
-* 
+*   Function insert Post facebook
+*       update and replace data
 * 
 */
 exports.insertPageFacebook = function( data ){
@@ -127,7 +128,11 @@ exports.insertPageFacebook = function( data ){
     console.log('Save Complete');
 };
 
-
+/**
+ *  Function get post facebook
+ *  
+ * 
+ */
 exports.getPostFacebook = function( query , callback ){
     fb_post_model.aggregate( 
         query,
