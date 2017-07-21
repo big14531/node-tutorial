@@ -8,7 +8,6 @@ var Schema = mongoose.Schema;
 *          -   fb_post_collection      =>      Store all post data ( post_id , message , created_date , likes , shares  , .... )
 *          -   fb_page_collection      =>      Store all page data ( page_id , page_name , insight(?) , ..... )
 * 
-* 
 */
 var fb_post_schema = new Schema({
     created_time    : Date,
@@ -97,7 +96,20 @@ var tt_user_schema = new Schema({
 mongoose.model( 'tt_tweet_collection' , tt_tweet_schema );
 mongoose.model( 'tt_user_collection' , tt_user_schema );
 
-exports.insertPostFacebook = function( data ){
+exports.insertPostFacebook  = insertPostFacebook;
+exports.insertPageFacebook  = insertPageFacebook;
+exports.getPostFacebook     = getPostFacebook;
+exports.getPageFacebook     = getPageFacebook;
+
+/**
+*   Function insert Post facebook
+*       update and replace data
+*   
+*   Input   : post data ( Json )
+*   Output  : error ( String )
+*
+*/
+function insertPostFacebook( data ){
     data.forEach(function(item) {
         fb_post_model.update(
             { id : item.id },
@@ -114,9 +126,12 @@ exports.insertPostFacebook = function( data ){
 /**
 *   Function insert Post facebook
 *       update and replace data
-* 
+*
+*   Input   : page data ( Json )
+*   Output  : error ( String ) 
+*
 */
-exports.insertPageFacebook = function( data ){
+function insertPageFacebook( data ){
     fb_page_model.update(
         { id : data.id },
         { $set : data },
@@ -125,20 +140,54 @@ exports.insertPageFacebook = function( data ){
             if(err) console.log(err);
         }
     );
-    console.log('Save Complete');
+    console.log('Save Page Complete');
 };
 
+
 /**
- *  Function get post facebook
- *  
- * 
- */
-exports.getPostFacebook = function( query , callback ){
+*  Function get post facebook
+*/
+function getPostFacebook( query , callback ){
     fb_post_model.aggregate( 
         query,
         function(err,result){
-            callback( result );
-            return result;
+            if( result.length!==0 ){
+                callback({
+                    status : 'found :'+result.length,
+                    data : result,
+                });
+            }
+            else{
+                callback({
+                    status : 'data not found',
+                    data : {},
+                });
+            }
+            return err;
+        } 
+    );
+}
+
+/**
+*  Function get page facebook
+*/
+function getPageFacebook( query , callback ){
+    fb_page_model.aggregate( 
+        query,
+        function(err,result){
+            if( result.length!==0 ){
+                callback({
+                    status : 'found :'+result.length,
+                    data : result,
+                });
+            }
+            else{
+                callback({
+                    status : 'data not found',
+                    data : {},
+                });
+            }
+            return err;
         } 
     );
 }

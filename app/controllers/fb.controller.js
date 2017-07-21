@@ -9,6 +9,10 @@ FB.options({version: 'v2.9'});
 /**
 *  Function pull Post  from api and update to db
 * 
+*   Input   : req.query.page_name ( string )
+*           : req.query.count ( string ) 
+*   Output  : error
+*
 */
 exports.savePostsAPI = function( req , res ){
 
@@ -36,7 +40,7 @@ exports.savePostsAPI = function( req , res ){
             'shares.limit(1).summary(true)'  ],
         limit:100
     }
-    var max_count = 1000;
+    var max_count = req.query.count;
 
     /**
     *  async description
@@ -55,8 +59,11 @@ exports.savePostsAPI = function( req , res ){
 }
 
 /**
-*  Function pull Page  from api and update to db
+*  Function pull Post  from api and update to db
 * 
+*   Input   : req.query.page_name ( string )
+*   Output  : error
+*
 */
 exports.savePageAPI = function( req , res ){
 
@@ -97,42 +104,75 @@ exports.savePageAPI = function( req , res ){
 }
 
 /**
-*  Function get Post by id , min_date , max_date , count
+*  Function get Post and provide JSON
 * 
+*   Input   : page_id ( string )
+*           : min_date ( date format : yyyy-mm-dd )
+*           : max_date ( date format : yyyy-mm-dd )
+*           : count ( string )
+*   Output  : post data ( JSON )
+*
 */
 exports.getPosts = function ( req , res ) {
-    var id   = req.query.id;
-    var min_date    = req.query.min_date;
-    var max_date    = req.query.max_date;
-    var count       = req.query.count;
 
+    /**
+    * Get 4 Parameters
+    *  1. page_id ( 'string' ) => Get post of this page.
+    *  2. min_date             => Get post after min_date.
+    *  3. max_date             => Get post before max_date.
+    *  4. count                => Number of Post that will returned.
+    */  
     var query = [
         { $match : { 'from.id'      : req.query.id }},
         { $match : { created_time   : {$gt: new Date(req.query.min_date) }}},
         { $match : { created_time   : {$lt: new Date(req.query.max_date) }}},
         { $limit : parseInt( req.query.count ) } 
     ];
+
     /**
     *  async description
     *  1. get Post from mongo by param
     *  2. injection query and callback for render json to screen
     *       **Closure with res
     */
-    console.log( query );
     async.waterfall([
-        async.apply( getPostsfromDB, [query ,  function(data){ res.json(data); }] )
+        async.apply( facebookQuery, [ query ,  function(data){ res.json(data); } , 'post'] )
     ], function (err, result) {
-        console.log( 'Show' );
+        console.log( 'Show Post' );
     });  
 }
 
 /**
-*  Function get Page data by page_name
+*  Function get Page data and provide JSON
 * 
+*   Input   : page_id ( string )
+*   Output  : post data ( JSON )
+*
 */
 exports.getPage = function ( req , res ) {
-    var page_name   = req.query.page_name;
+
+    /**
+    * Get 1 Parameters
+    *  1. page_id ( 'string' ) => Get post of this page.
+    */  
+
+    var query = [
+        { $match : { 'id' : req.query.page_name }}
+    ];
+    /**
+    *  async description
+    *  1. get Page from mongo by param
+    *  2. injection query and callback for render json to screen
+    *       **Closure with res
+    */
+
+    async.waterfall([
+        async.apply( facebookQuery, [ query ,  function(data){ res.json(data); } , 'page' ] )
+    ], function (err, result) {
+        console.log( result );
+    });  
 }
+
 
 /**
 *  Function call facebook api endpoint for get post data and recursive paging
@@ -155,25 +195,6 @@ function pullPostfromAPI( param_array , error , callback ) {
     });
     
     callback( null ,"Done!!");
-}
-
-/**
-*  Function recursive for getPost
-* @param {*} res           =>  respond object from API
-* @param {*} param_array   =>  query field
-* @param {*} count         =>  Counter number , stop recursive when equal 0
-*/
-function recursivePost( res , param_array , count ) {
-    if( count<=0 ) return;
-    graph.get( res.paging.next , function (err,res) {
-        if(!res || err) {
-            console.log(!res ? 'error occurred' : err);
-            return;
-        }
-        model.insertPostFacebook( res.data );
-        count -= param_array[1].limit;
-        recursivePost( res , param_array , count );
-    });
 }
 
 
@@ -200,6 +221,26 @@ function pullPagefromAPI( param_array , error , callback ) {
 
 
 /**
+*  Function recursive for getPost
+* @param {*} res           =>  respond object from API
+* @param {*} param_array   =>  query field
+* @param {*} count         =>  Counter number , stop recursive when equal 0
+*/
+function recursivePost( res , param_array , count ) {
+    if( count<=0 ) return;
+    graph.get( res.paging.next , function (err,res) {
+        if(!res || err) {
+            console.log(!res ? 'error occurred' : err);
+            return;
+        }
+        model.insertPostFacebook( res.data );
+        count -= param_array[1].limit;
+        recursivePost( res , param_array , count );
+    });
+}
+
+
+/**
 * Function get access Token by facebook client_id and secert_id 
 */
 function getAccessToken( callback ) {
@@ -218,12 +259,28 @@ function getAccessToken( callback ) {
     });
 }
 
+
 /**
- * 
- * @param {*} query 
- * @param {*} callback 
- */
-function getPostsfromDB( query , callback ){
-    var result = model.getPostFacebook( query[0] , query[1] )
+*   Function connect with model
+*
+*   1. Check request type => ( post , page )
+*   2. Call model funciton
+*
+* @param {*} query  { query , callback , type }
+* @param {*} callback 
+*/
+function facebookQuery( data , callback ){
+
+    // Assign variable for developer can read
+    var query       = data[0];
+    var renderCB    = data[1];
+    var type        = data[2];
+    
+    if( type=='post' ){
+        var result = model.getPostFacebook( query , renderCB )
+    }
+    if( type=='page' ){
+        var result = model.getPageFacebook( query , renderCB )
+    }
     callback( null , result );
 }
